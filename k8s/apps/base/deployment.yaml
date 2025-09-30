@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: petclinic
-          image: springcommunity/spring-framework-petclinic:6.1.2 # TEMP FOR TESTING
+          image: springcommunity/spring-framework-petclinic:6.1.2
           ports:
             - name: http
               containerPort: 8080

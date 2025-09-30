@@ -5,4 +5,11 @@ resources:
   - ../../base
 
 patches:
-  - path: prod-deployment.yaml
+  - path: deployment.yaml
+  - path: version.yaml
+  - path: hostname.yaml
+    target:
+      group: networking.k8s.io
+      version: v1
+      kind: Ingress
+      name: petclinic-ingress

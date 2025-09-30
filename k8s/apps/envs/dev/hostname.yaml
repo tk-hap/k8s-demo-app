@@ -1,0 +1,4 @@
+# Kustomize JsonPatch format
+- op: add
+  path: /spec/rules/0/host
+  value: petclinic.dev.example
