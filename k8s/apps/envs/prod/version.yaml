@@ -1,0 +1,10 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: petclinic-deployment
+spec:
+  template:
+    spec:
+      containers:
+        - name: petclinic
+          image: springcommunity/spring-framework-petclinic:6.1.2

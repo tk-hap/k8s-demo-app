@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: petclinic-deployment
+  labels:
+    app: petclinic-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: petclinic-deployment
+  template:
+    metadata:
+      labels:
+        app: petclinic-deployment
+    spec:
+      containers:
+        - name: petclinic
+          image: springcommunity/spring-framework-petclinic:6.1.2
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          imagePullPolicy: IfNotPresent
