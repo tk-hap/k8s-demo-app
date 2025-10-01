@@ -1,0 +1,26 @@
+name: Build Image
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to ghcr.io
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build and tag image
+        run: |
+          COMMIT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
+          docker build -t ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:$COMMIT_SHA -f Dockerfile .    
+
+      - name: Push image to GHCR
+        run: docker push ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:$COMMIT_SHA
