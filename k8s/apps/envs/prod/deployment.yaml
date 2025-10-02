@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   name: petclinic-deployment
 spec:
-  replicas: 3 
   template:
     spec:
       containers:
