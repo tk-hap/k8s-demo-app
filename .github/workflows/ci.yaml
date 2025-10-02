@@ -1,13 +1,18 @@
-name: CI - Build Image
+name: CI - Build Image & Push to Dev
 
 on:
   push:
     branches:
       - main
-    paths-ignore: # Ignore changes that do not affect the image build
+    paths-ignore: # Avoid loops on version bumps and non-image areas
       - '.github/workflows/**'
       - 'k8s/**'
   workflow_dispatch:
+
+permissions:
+  contents: write      # needed to commit version.yaml update
+  packages: write      # push to GHCR
+  actions: read
 
 jobs:
   build:
@@ -40,3 +45,28 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Update dev version.yaml with new image tag
+        if: github.ref == 'refs/heads/main'
+        run: |
+          FILE=k8s/app/envs/dev/version.yaml
+          if [ ! -f "$FILE" ]; then
+            echo "Missing $FILE"; exit 1; fi
+          IMAGE="ghcr.io/${{ github.repository_owner }}/petclinic:${{ steps.meta.outputs.tags}}"
+          # Replace existing image line 
+          sed -i "s|^\([[:space:]]*image:[[:space:]]*\).*|\1${IMAGE}|" "$FILE"
+          echo "Updated $FILE -> $IMAGE"
+
+      - name: Commit version bump
+        if: github.ref == 'refs/heads/main'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "ci: update dev image to ${{ steps.tag.outputs.short }}"
+          file_pattern: k8s/app/envs/dev/version.yaml
+          branch: main
+
+      - name: Summary
+        run: |
+          echo "Image tags produced:" >> $GITHUB_STEP_SUMMARY
+          echo '${{ steps.meta.outputs.tags }}' | sed 's/^/- /' >> $GITHUB_STEP_SUMMARY
+          echo "Dev version.yaml updated to tag ${{ steps.tag.outputs.short }}" >> $GITHUB_STEP_SUMMARY
