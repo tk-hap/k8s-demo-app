@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: petclinic-app
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/tk-hap/k8s-demo-app.git
+        revision: main
+        directories:
+          - path: k8s/app/envs/*
+  template:
+    metadata:
+      name: petclinic-{{path.basename}}
+      labels:
+        app.kubernetes.io/name: petclinic
+        environment: "{{path.basename}}"
+        component: petclinic
+      annotations:
+        argocd.argoproj.io/sync-wave: >-
+          {{- if eq path.basename "dev" -}}10{{- else if eq path.basename "prod" -}}20{{- else -}}50{{- end -}}
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/tk-hap/k8s-demo-app.git
+        targetRevision: main
+        path: "{{path}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: petclinic-{{path.basename}}
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - PrunePropagationPolicy=foreground
+          - PruneLast=true
+          - ServerSideApply=true
+      revisionHistoryLimit: 3
