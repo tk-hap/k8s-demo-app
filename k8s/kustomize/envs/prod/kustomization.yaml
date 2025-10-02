@@ -5,6 +5,7 @@ resources:
   - ../../base
 
 patches:
+  - path: db-cluster.yaml
   - path: deployment.yaml
   - path: version.yaml
   - path: hpa.yaml

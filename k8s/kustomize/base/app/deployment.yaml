@@ -16,6 +16,14 @@ spec:
       containers:
         - name: petclinic
           image: springcommunity/spring-framework-petclinic:6.1.2
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: postgres
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: petclinic-db-app
+                  key: jdbc-uri
           ports:
             - name: http
               containerPort: 8080
@@ -23,8 +31,8 @@ spec:
           imagePullPolicy: IfNotPresent
           readinessProbe:
             httpGet:
-            path: /actuator/health/readiness
-            port: 8080
+              path: /actuator/health/readiness
+              port: 8080
             initialDelaySeconds: 15
             periodSeconds: 10
             failureThreshold: 3
