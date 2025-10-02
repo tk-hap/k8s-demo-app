@@ -1,0 +1,43 @@
+name: Promote to Prod
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "(Optional) Override tag after copying dev version.yaml"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Copy dev version.yaml to prod
+        run: |
+          DEV_FILE=k8s/app/envs/dev/version.yaml
+          PROD_FILE=k8s/app/envs/prod/version.yaml
+          if [ ! -f "$DEV_FILE" ]; then
+            echo "Dev version file not found: $DEV_FILE" >&2; exit 1; fi
+          cp "$DEV_FILE" "$PROD_FILE"
+          echo "Copied $DEV_FILE -> $PROD_FILE"
+
+      - name: Optional override image tag
+        if: ${{ github.event.inputs.image_tag != '' }}
+        run: |
+          PROD_FILE=k8s/app/envs/prod/version.yaml
+          TAG='${{ github.event.inputs.image_tag }}'
+          sed -i "s|^\([[:space:]]*image:[[:space:]]*ghcr.io/.*/petclinic:\).*|\1${TAG}|" "$PROD_FILE"
+          echo "Overrode image tag in $PROD_FILE to ${TAG}"
+
+      - name: Commit and push
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "ci: promote dev version.yaml to prod${{ github.event.inputs.image_tag != '' && format(' (override tag {0})', github.event.inputs.image_tag) || '' }}"
+          branch: main
+          file_pattern: k8s/app/envs/prod/version.yaml
