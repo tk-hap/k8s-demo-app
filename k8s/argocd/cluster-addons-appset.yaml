@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cluster-addons
+spec:
+  generators:
+    - list:
+        elements:
+          - name: cloudnative-pg-operator
+            path: k8s/addons/cloudnative-pg-operator
+            namespace: cnpg-system
+            syncWave: "10"
+          - name: metrics-server
+            path: k8s/addons/metrics-server
+            namespace: kube-system
+            syncWave: "20"
+  template:
+    metadata:
+      name: '{{name}}'
+      labels:
+        addon: '{{name}}'
+      annotations:
+        # Ensures operator (wave 10) before others (higher numbers) if a future addon depends on it
+        argocd.argoproj.io/sync-wave: '{{syncWave}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/tk-hap/k8s-demo-app.git   # update to your repo
+        targetRevision: feature/gitops-addons
+        path: '{{path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - PrunePropagationPolicy=foreground
+          - PruneLast=true
+          - ServerSideApply=true
