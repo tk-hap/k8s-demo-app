@@ -5,7 +5,6 @@ metadata:
   labels:
     app: petclinic-deployment
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: petclinic-deployment
@@ -22,3 +21,10 @@ spec:
               containerPort: 8080
               protocol: TCP
           imagePullPolicy: IfNotPresent
+          readinessProbe:
+            httpGet:
+            path: /actuator/health/readiness
+            port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3

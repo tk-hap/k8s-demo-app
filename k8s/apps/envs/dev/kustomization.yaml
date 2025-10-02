@@ -7,6 +7,7 @@ resources:
 patches:
   - path: deployment.yaml
   - path: version.yaml
+  - path: hpa.yaml
   - path: hostname.yaml
     target:
       group: networking.k8s.io
