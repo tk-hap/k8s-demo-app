@@ -1,0 +1,16 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: petclinic-db
+spec:
+  instances: 3
+  storage:
+    size: 5Gi
+  primaryUpdateStrategy: supervised #  requires manual supervision to perform the switchover of the primary
+  resources:
+    requests:
+      memory: "1250Mi"
+      cpu: "750mm"
+    limits:
+      memory: "1250Mi"
+      cpu: "1000m"

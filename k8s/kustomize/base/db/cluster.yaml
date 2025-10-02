@@ -1,0 +1,23 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: petclinic-db
+spec:
+  instances: 1 
+  imageName: ghcr.io/cloudnative-pg/postgresql:17.6-minimal-bookworm
+  primaryUpdateStrategy: unsupervised
+  storage:
+    size: 5Gi
+  bootstrap:
+    initdb:
+      database: petclinic
+      owner: petclinic
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "750m"
+  monitoring:
+    enablePodMonitor: true
