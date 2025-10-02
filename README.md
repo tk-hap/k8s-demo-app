@@ -28,7 +28,7 @@ k8s/
 | Implement Load Balancing | Ingress with class `nginx` + ingress-nginx controller addon | `frontend/ingress.yaml`, `addons/cluster-addons-appset.yaml` |
 | Rolling Updates & Rollbacks | Native Deployment strategy (RollingUpdate default) + image tag overlay for progressive releases | `deployment.yaml`, `envs/dev/version.yaml` |
 | Network Policies | Fine-grained ingress/egress limiting app->DB & DNS only | `frontend/networkpolicy.yaml` |
-| Enable Monitoring (metrics) | Metrics-server + HPA; Postgres PodMonitor enabled | `addons/applicationset.yaml`, `db/cluster.yaml` |
+| Enable Monitoring (metrics) | Metrics-server + HPA; Postgres PodMonitor enabled | `k8s/argocd/cluster-addons-appset.yaml`, `db/cluster.yaml` |
 | GitOps Automation | Argo CD ApplicationSet manages addons; (app overlays compatible with Argo CD / Kustomize) | `k8s/argocd/cluster-addons-appset.yaml`, `k8s/argocd/petclinic-appset.yaml` |
 
 ### Not (Yet) Implemented (Future Enhancements)
