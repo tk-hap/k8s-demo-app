@@ -91,7 +91,7 @@ Steps:
 2. (Optional) Overwrite tag if `image_tag` provided
 3. Commit the prod version file back to `main`
 
-Promotion is and decoupled from build events an easily auditable.
+Promotion is decoupled from build events an easily auditable.
 
 ### Rollback
 Two options:
