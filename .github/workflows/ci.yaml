@@ -1,9 +1,12 @@
-name: Build Image
+name: CI - Build Image
 
 on:
   push:
     branches:
       - main
+    paths-ignore: # Ignore changes that do not affect the image build
+      - '.github/workflows/**'
+      - 'k8s/**'
   workflow_dispatch:
 
 jobs:
@@ -25,7 +28,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ghcr.io/${{ github.repository_owner }}/petclinic
           tags: |
              type=sha,format=short,prefix=
 
