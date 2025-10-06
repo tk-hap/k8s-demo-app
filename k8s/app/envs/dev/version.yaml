@@ -7,4 +7,4 @@ spec:
     spec:
       containers:
         - name: petclinic
-          image: ghcr.io/tk-hap/petclinic:ghcr.io/tk-hap/petclinic:9ed1776
+          image: ghcr.io/tk-hap/petclinic:9ed1776

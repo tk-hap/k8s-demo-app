@@ -2,11 +2,6 @@ name: Promote to Prod
 
 on:
   workflow_dispatch:
-    inputs:
-      image_tag:
-        description: "(Optional) Override tag after copying dev version.yaml"
-        required: false
-        default: ""
 
 permissions:
   contents: write
@@ -27,17 +22,9 @@ jobs:
           cp "$DEV_FILE" "$PROD_FILE"
           echo "Copied $DEV_FILE -> $PROD_FILE"
 
-      - name: Optional override image tag
-        if: ${{ github.event.inputs.image_tag != '' }}
-        run: |
-          PROD_FILE=k8s/app/envs/prod/version.yaml
-          TAG='${{ github.event.inputs.image_tag }}'
-          sed -i "s|^\([[:space:]]*image:[[:space:]]*ghcr.io/.*/petclinic:\).*|\1${TAG}|" "$PROD_FILE"
-          echo "Overrode image tag in $PROD_FILE to ${TAG}"
-
       - name: Commit and push
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "ci: promote dev version.yaml to prod${{ github.event.inputs.image_tag != '' && format(' (override tag {0})', github.event.inputs.image_tag) || '' }}"
+          commit_message: "ci: promote dev version.yaml to prod"
           branch: main
           file_pattern: k8s/app/envs/prod/version.yaml

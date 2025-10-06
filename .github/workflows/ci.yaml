@@ -49,19 +49,13 @@ jobs:
       - name: Update dev version.yaml with new image tag
         if: github.ref == 'refs/heads/main'
         run: |
-          FILE=k8s/app/envs/dev/version.yaml
-          if [ ! -f "$FILE" ]; then
-            echo "Missing $FILE"; exit 1; fi
-          IMAGE="ghcr.io/${{ github.repository_owner }}/petclinic:${{ steps.meta.outputs.tags}}"
-          # Replace existing image line 
-          sed -i "s|^\([[:space:]]*image:[[:space:]]*\).*|\1${IMAGE}|" "$FILE"
-          echo "Updated $FILE -> $IMAGE"
+          yq -i '.spec.template.spec.containers[0].image = "${{ steps.meta.outputs.tags}}"' 'k8s/app/envs/dev/version.yaml'
 
       - name: Commit version bump
         if: github.ref == 'refs/heads/main'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "ci: update dev image to ${{ steps.tag.outputs.short }}"
+          commit_message: "ci: update dev image to ${{ steps.meta.outputs.tags}}"
           file_pattern: k8s/app/envs/dev/version.yaml
           branch: main
 
@@ -69,4 +63,4 @@ jobs:
         run: |
           echo "Image tags produced:" >> $GITHUB_STEP_SUMMARY
           echo '${{ steps.meta.outputs.tags }}' | sed 's/^/- /' >> $GITHUB_STEP_SUMMARY
-          echo "Dev version.yaml updated to tag ${{ steps.tag.outputs.short }}" >> $GITHUB_STEP_SUMMARY
+          echo "Dev version.yaml updated to tag ${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
